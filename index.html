@@ -1,0 +1,222 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Promisekit by mxcl</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Promisekit</h1>
+        <p>A delightful Promises implementation for iOS</p>
+        <p class="view"><a href="https://github.com/mxcl/PromiseKit">View the Project on GitHub <small>mxcl/PromiseKit</small></a></p>
+        <ul>
+          <li><a href="https://github.com/mxcl/PromiseKit/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/mxcl/PromiseKit/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/mxcl/PromiseKit">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p>PromiseKit aims to make dealing with assyncronicity in your iPhone app <em>delightful</em>. PromiseKit is not just a Promises implementation, it is also a collection of helper functions that make the typical asyncronous patterns we use in iOS development <em>delightful</em> too.</p>
+
+<h1>
+<a name="what-is-a-promise" class="anchor" href="#what-is-a-promise"><span class="octicon octicon-link"></span></a>What is a Promise?</h1>
+
+<p>A promise is an intent to accomplish an asyncronous task. Eg. some library promises to download a <a href="http://gravatar.com">gravatar</a>:</p>
+
+<div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit.h"</span>
+
+<span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">gravatar</span> <span class="p">{</span>
+    <span class="p">[</span><span class="n">ABCDoEverythingLibrary</span> <span class="n">gravatar</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
+    <span class="p">}).</span><span class="n">fail</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">){</span>
+        <span class="n">NSLog</span><span class="p">(</span><span class="s">@"%@"</span><span class="p">,</span> <span class="n">error</span><span class="p">);</span>
+    <span class="p">})</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>The designer changes their mind (again). They want us to overlay a kitten on the gravatar:</p>
+
+<div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit.h"</span>
+
+<span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">gravatar</span> <span class="p">{</span>
+    <span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+
+    <span class="p">[</span><span class="n">ABCDoEverythingLibrary</span> <span class="n">gravatar</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
+        <span class="n">gravatarImage</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
+    <span class="p">}).</span><span class="n">fail</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">){</span>
+        <span class="n">NSLog</span><span class="p">(</span><span class="s">@"%@"</span><span class="p">,</span> <span class="n">error</span><span class="p">);</span>
+    <span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://placekitten.com/100/100"</span><span class="p">];</span>
+    <span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">kittenImage</span><span class="p">){</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIImage</span> <span class="n">draw</span><span class="o">:</span><span class="n">kittenImage</span> <span class="n">over</span><span class="o">:</span><span class="n">gravatarImage</span><span class="p">];</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Whoops! We aren’t handling the potential <code>NSURLConnection</code> error:</p>
+
+<div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit.h"</span>
+
+<span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">gravatar</span> <span class="p">{</span>
+    <span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+
+    <span class="p">[</span><span class="n">ABCDoEverythingLibrary</span> <span class="n">gravatar</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
+        <span class="n">gravatarImage</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
+    <span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://placekitten.com/100/100"</span><span class="p">];</span>
+    <span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">kittenImage</span><span class="p">){</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIImage</span> <span class="n">draw</span><span class="o">:</span><span class="n">kittenImage</span> <span class="n">over</span><span class="o">:</span><span class="n">gravatarImage</span><span class="p">];</span>
+    <span class="p">}).</span><span class="n">fail</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">){</span>
+        <span class="c1">// moved to the end: any errors or thrown exceptions will bubble up</span>
+        <span class="n">NSLog</span><span class="p">(</span><span class="s">@"%@"</span><span class="p">,</span> <span class="n">error</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>We need to refactor this code so our <code>imageView</code> is set elsewhere:</p>
+
+<div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit.h"</span>
+
+<span class="k">-</span> <span class="p">(</span><span class="n">Promise</span> <span class="o">*</span><span class="p">)</span><span class="nf">gravatar</span> <span class="p">{</span>
+    <span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+
+    <span class="p">[</span><span class="n">ABCDoEverythingLibrary</span> <span class="n">gravatar</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
+        <span class="n">gravatarImage</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
+    <span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://placekitten.com/100/100"</span><span class="p">];</span>
+    <span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">kittenImage</span><span class="p">){</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">UIImage</span> <span class="n">draw</span><span class="o">:</span><span class="n">kittenImage</span> <span class="n">over</span><span class="o">:</span><span class="n">gravatarImage</span><span class="p">];</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">viewDidLoad</span> <span class="p">{</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">gravatar</span><span class="p">.</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
+    <span class="p">}).</span><span class="n">fail</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">){</span>
+        <span class="c1">//TODO UIAlertView</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>In production we find that <code>ABCDoEverythingLibrary</code> is a buggy, bloated mostrosity. So we hastily reinvent the wheel:</p>
+
+<div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit.h"</span>
+
+<span class="k">-</span> <span class="p">(</span><span class="n">Promise</span> <span class="o">*</span><span class="p">)</span><span class="nf">gravatar</span> <span class="p">{</span>
+    <span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+
+    <span class="p">[</span><span class="n">Promise</span> <span class="n">md5</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span><span class="p">){</span>
+        <span class="c1">// The MD5 is crunched in a background GCD queue</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://gravatar.com/avatar/%@"</span><span class="p">,</span> <span class="n">md5</span><span class="p">];</span>
+    <span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://placekitten.com/100/100"</span><span class="p">];</span>
+    <span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">kittenImage</span><span class="p">){</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">UIImage</span> <span class="n">draw</span><span class="o">:</span><span class="n">kittenImage</span> <span class="n">over</span><span class="o">:</span><span class="n">gravatarImage</span><span class="p">];</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Later we realize we’re wasting our users’ lives by downloading the two images
+consequentively:</p>
+
+<div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit.h"</span>
+
+<span class="k">-</span> <span class="p">(</span><span class="n">Promise</span> <span class="o">*</span><span class="p">)</span><span class="nf">gravatar</span> <span class="p">{</span>
+    <span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+
+    <span class="p">[</span><span class="n">Promise</span> <span class="n">md5</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span><span class="p">){</span>
+        <span class="kt">id</span> <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://gravatar.com/avatar/%@"</span><span class="p">,</span> <span class="n">md5</span><span class="p">];</span>
+        <span class="kt">id</span> <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://placekitten.com/100/100"</span><span class="p">];</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">Promise</span> <span class="n">when</span><span class="o">:</span><span class="p">@[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]];</span>
+    <span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSArray</span> <span class="o">*</span><span class="n">images</span><span class="p">){</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">UIImage</span> <span class="n">draw</span><span class="o">:</span><span class="n">images</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="n">over</span><span class="o">:</span><span class="n">images</span><span class="p">[</span><span class="mi">1</span><span class="p">]];</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+
+<h2>
+<a name="the-niceties" class="anchor" href="#the-niceties"><span class="octicon octicon-link"></span></a>The Niceties</h2>
+
+<p>We provide some convenience methods on <code>NSURLConnection</code> that return promises:</p>
+
+<div class="highlight highlight-objc"><pre><span class="k">+</span> <span class="p">(</span><span class="n">Promise</span> <span class="o">*</span><span class="p">)</span><span class="nf">GET:</span><span class="p">(</span><span class="kt">id</span><span class="p">)</span><span class="nv">stringFormatOrURL</span><span class="p">,</span> <span class="p">...</span>
+<span class="k">+</span> <span class="p">(</span><span class="n">Promise</span> <span class="o">*</span><span class="p">)</span><span class="nf">send:</span><span class="p">(</span><span class="n">NSURLRequest</span> <span class="o">*</span><span class="p">)</span><span class="nv">request</span><span class="p">;</span>
+
+<span class="c1">// et cetera</span>
+</pre></div>
+
+<p>We also detect if the content-type is JSON or an image and process the data into a <code>UIImage</code>, etc. in a background thread.</p>
+
+<p>We provide a promise for <code>CLLocationManager</code>:</p>
+
+<div class="highlight highlight-objc"><pre><span class="p">[</span><span class="n">CLLocationManager</span> <span class="n">promise</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">CLLocation</span> <span class="o">*</span><span class="n">location</span><span class="p">){</span>
+    <span class="c1">// woot</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>We provide a promise structure for modally presenting <code>UIViewController</code>s:</p>
+
+<div class="highlight highlight-objc"><pre>
+<span class="p">[</span><span class="n">self</span> <span class="n">promiseViewController</span><span class="o">:</span><span class="n">myViewController</span> <span class="n">animated</span><span class="o">:</span><span class="nb">YES</span> <span class="n">completion</span><span class="o">:</span><span class="nb">nil</span><span class="p">];</span>
+
+
+<span class="k">@implementation</span> <span class="nc">MyViewController</span>
+
+<span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">viewWillDefer:</span><span class="p">(</span><span class="n">Deferred</span> <span class="o">*</span><span class="p">)</span><span class="nv">deferred</span> <span class="p">{</span>
+    <span class="c1">// save this and resolve/reject it when you are done</span>
+    <span class="n">_deferred</span> <span class="o">=</span> <span class="n">deferred</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">onCompletedWhatever</span> <span class="p">{</span>
+    <span class="p">[</span><span class="n">_deferred</span> <span class="n">resolve</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">textField</span><span class="p">.</span><span class="n">text</span><span class="p">];</span>  <span class="c1">// dismisses the viewController</span>
+<span class="p">}</span>
+
+<span class="k">@end</span>
+</pre></div>
+
+<h1>
+<a name="deferred" class="anchor" href="#deferred"><span class="octicon octicon-link"></span></a>Deferred</h1>
+
+<p>You won’t use PromiseKit for long before you need to make your own promises. As per other Promise implementations we use the Deferred pattern. Create a deferred and return its promise to the caller. Then <code>resolve</code> or <code>reject</code> the deferred according to the result of your asyncronous operation.</p>
+
+<div class="highlight highlight-objc"><pre><span class="k">-</span> <span class="p">(</span><span class="n">Promise</span> <span class="o">*</span><span class="p">)</span><span class="nf">randomNumbers</span> <span class="p">{</span>
+    <span class="n">Deferred</span> <span class="o">*</span><span class="n">deferred</span> <span class="o">=</span> <span class="p">[</span><span class="n">Deferred</span> <span class="n">new</span><span class="p">];</span>
+    <span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">operationQueue</span> <span class="n">addOperationWithBlock</span><span class="o">:^</span><span class="p">{</span>
+        <span class="n">NSMutableArray</span> <span class="o">*</span><span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSMutableArray</span> <span class="n">new</span><span class="p">];</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">1000</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span>
+            <span class="p">[</span><span class="n">numbers</span> <span class="n">addObject</span><span class="o">:</span><span class="p">@(</span><span class="n">arc4random</span><span class="p">())];</span>
+        <span class="p">[</span><span class="n">deferred</span> <span class="n">resolve</span><span class="o">:</span><span class="n">numbers</span><span class="p">];</span>
+    <span class="p">}];</span>
+    <span class="k">return</span> <span class="n">deferred</span><span class="p">.</span><span class="n">promise</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<h1>
+<a name="important-details-regarding-promises" class="anchor" href="#important-details-regarding-promises"><span class="octicon octicon-link"></span></a>Important Details Regarding “Promises”</h1>
+
+<ol>
+<li>A promise moves from its <code>unfulfilled</code> state to either <code>resolved</code> or <code>rejected</code> <em>exactly <strong>once</strong></em>.</li>
+<li>A resolved or rejected promise that is then’d or fail’d returns its already computed result.</li>
+<li>Errors bubble upwards to the first available fail handler</li>
+</ol>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/mxcl">mxcl</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
