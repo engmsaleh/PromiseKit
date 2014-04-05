@@ -37,13 +37,19 @@
 <div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit.h"</span>
 
 <span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">gravatar</span> <span class="p">{</span>
-    <span class="p">[</span><span class="n">ABCDoEverythingLibrary</span> <span class="n">gravatar</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
+    <span class="n">Promise</span> <span class="o">*</span><span class="n">promise</span> <span class="o">=</span> <span class="p">[</span><span class="n">ABCDoEverythingLibrary</span> <span class="n">gravatar</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">];</span>
+
+    <span class="n">promise</span><span class="p">.</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
         <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
     <span class="p">}).</span><span class="n">fail</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">){</span>
         <span class="n">NSLog</span><span class="p">(</span><span class="s">@"%@"</span><span class="p">,</span> <span class="n">error</span><span class="p">);</span>
     <span class="p">})</span>
 <span class="p">}</span>
 </pre></div>
+
+<p>A key feature of promises is that they are <em>thennable</em>.</p>
+
+<p>Another key feature is that they are <em>chainable</em>.</p>
 
 <p>The designer changes their mind (again). They want us to overlay a kitten on the gravatar:</p>
 
@@ -83,6 +89,8 @@
     <span class="p">});</span>
 <span class="p">}</span>
 </pre></div>
+
+<p>Errors bubble <em>up</em> to the nearest fail handler. Notably exceptions are caught and bubbled up also.</p>
 
 <p>We need to refactor this code so our <code>imageView</code> is set elsewhere:</p>
 
@@ -168,10 +176,16 @@ consequentively:</p>
 <p>We provide a promise structure for modally presenting <code>UIViewController</code>s:</p>
 
 <div class="highlight highlight-objc"><pre>
-<span class="p">[</span><span class="n">self</span> <span class="n">promiseViewController</span><span class="o">:</span><span class="n">myViewController</span> <span class="n">animated</span><span class="o">:</span><span class="nb">YES</span> <span class="n">completion</span><span class="o">:</span><span class="nb">nil</span><span class="p">];</span>
+<span class="k">@implementation</span> <span class="nc">MyRootViewController</span>
+
+<span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">foo</span> <span class="p">{</span>
+    <span class="p">[</span><span class="n">self</span> <span class="n">promiseViewController</span><span class="o">:</span><span class="n">myDetailViewController</span> <span class="n">animated</span><span class="o">:</span><span class="nb">YES</span> <span class="n">completion</span><span class="o">:</span><span class="nb">nil</span><span class="p">];</span>
+<span class="p">}</span>
+
+<span class="k">@end</span>
 
 
-<span class="k">@implementation</span> <span class="nc">MyViewController</span>
+<span class="k">@implementation</span> <span class="nc">MyDetailViewController</span>
 
 <span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">viewWillDefer:</span><span class="p">(</span><span class="n">Deferred</span> <span class="o">*</span><span class="p">)</span><span class="nv">deferred</span> <span class="p">{</span>
     <span class="c1">// save this and resolve/reject it when you are done</span>
