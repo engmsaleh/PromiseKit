@@ -29,6 +29,8 @@
       <section>
         <p>PromiseKit aims to make dealing with asynchronicity in your iPhone app <em>delightful</em>. PromiseKit is not just a Promises implementation, it is also a collection of helper functions that make the typical asyncronous patterns we use in iOS development <em>delightful</em> too.</p>
 
+<p>Modern development is highly asynchronous: isn’t it about time we had tools that made programming asynchronously powerful, easy and delightful?</p>
+
 <h1>
 <a name="what-is-a-promise" class="anchor" href="#what-is-a-promise"><span class="octicon octicon-link"></span></a>What is a Promise?</h1>
 
@@ -37,7 +39,7 @@
 <div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit.h"</span>
 
 <span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">gravatar</span> <span class="p">{</span>
-    <span class="n">Promise</span> <span class="o">*</span><span class="n">promise</span> <span class="o">=</span> <span class="p">[</span><span class="n">ABCDoEverythingLibrary</span> <span class="n">gravatar</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">];</span>
+    <span class="n">Promise</span> <span class="o">*</span><span class="n">promise</span> <span class="o">=</span> <span class="p">[</span><span class="n">ABCDoEverythingLibrary</span> <span class="n">gravatarURLForEmail</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">];</span>
 
     <span class="n">promise</span><span class="p">.</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
         <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
@@ -58,7 +60,7 @@
 <span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">gravatar</span> <span class="p">{</span>
     <span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
 
-    <span class="p">[</span><span class="n">ABCDoEverythingLibrary</span> <span class="n">gravatar</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
+    <span class="p">[</span><span class="n">ABCDoEverythingLibrary</span> <span class="n">gravatarURLForEmail</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
         <span class="n">gravatarImage</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
     <span class="p">}).</span><span class="n">fail</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">){</span>
         <span class="n">NSLog</span><span class="p">(</span><span class="s">@"%@"</span><span class="p">,</span> <span class="n">error</span><span class="p">);</span>
@@ -70,14 +72,14 @@
 <span class="p">}</span>
 </pre></div>
 
-<p>Whoops! We aren’t handling the potential <code>NSURLConnection</code> error:</p>
+<p>Whoops! We aren’t handling the potential <code>NSURLConnection</code> error. Errors bubble up to the next fail handler, but they won't go backwards.</p>
 
 <div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit.h"</span>
 
 <span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">gravatar</span> <span class="p">{</span>
     <span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
 
-    <span class="p">[</span><span class="n">ABCDoEverythingLibrary</span> <span class="n">gravatar</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
+    <span class="p">[</span><span class="n">ABCDoEverythingLibrary</span> <span class="n">gravatarURLForEmail</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
         <span class="n">gravatarImage</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
     <span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://placekitten.com/100/100"</span><span class="p">];</span>
@@ -90,16 +92,16 @@
 <span class="p">}</span>
 </pre></div>
 
-<p>Errors bubble <em>up</em> to the nearest fail handler. Notably exceptions are caught and bubbled up also.</p>
+<p>Notably exceptions are caught and bubbled up also.</p>
 
-<p>We need to refactor this code so our <code>imageView</code> is set elsewhere:</p>
+<p>Later we decide to refactor this code so our <code>imageView</code> is set elsewhere:</p>
 
 <div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit.h"</span>
 
 <span class="k">-</span> <span class="p">(</span><span class="n">Promise</span> <span class="o">*</span><span class="p">)</span><span class="nf">gravatar</span> <span class="p">{</span>
     <span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
 
-    <span class="k">return</span> <span class="p">[</span><span class="n">ABCDoEverythingLibrary</span> <span class="n">gravatar</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">ABCDoEverythingLibrary</span> <span class="n">gravatarURLForEmail</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
         <span class="n">gravatarImage</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
     <span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://placekitten.com/100/100"</span><span class="p">];</span>
@@ -153,13 +155,32 @@ consequentively:</p>
 <span class="p">}</span>
 </pre></div>
 
+<p>We realize we need to preload the next gravatar when <code>viewWillAppear</code> is called (or after) but the first gravatar must have loaded first:</p>
+
+<div class="highlight highlight-objc"><pre><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">viewDidLoad</span> <span class="p">{</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">gravatar</span><span class="p">.</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
+    <span class="p">}).</span><span class="n">fail</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">){</span>
+        <span class="c1">//TODO UIAlertView</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">viewWillAppear:</span><span class="p">(</span><span class="kt">BOOL</span><span class="p">)</span><span class="nv">animated</span> <span class="p">{</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">gravatar</span><span class="p">.</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+        <span class="p">[</span><span class="n">self</span> <span class="n">fetchNextGravatar</span><span class="p">];</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>This is a key concept in Promises. If the asynchronous task has finished, or is pending, it doesn't matter, we can still chain other tasks onto that Promise and know they will be handled either now or later, and in our chosen order.</p>
+
 <h2>
 <a name="the-niceties" class="anchor" href="#the-niceties"><span class="octicon octicon-link"></span></a>The Niceties</h2>
 
 <p>We provide some convenience methods on <code>NSURLConnection</code> that return promises:</p>
 
 <div class="highlight highlight-objc"><pre><span class="k">+</span> <span class="p">(</span><span class="n">Promise</span> <span class="o">*</span><span class="p">)</span><span class="nf">GET:</span><span class="p">(</span><span class="kt">id</span><span class="p">)</span><span class="nv">stringFormatOrURL</span><span class="p">,</span> <span class="p">...</span>
-<span class="k">+</span> <span class="p">(</span><span class="n">Promise</span> <span class="o">*</span><span class="p">)</span><span class="nf">send:</span><span class="p">(</span><span class="n">NSURLRequest</span> <span class="o">*</span><span class="p">)</span><span class="nv">request</span><span class="p">;</span>
+<span class="k">+</span> <span class="p">(</span><span class="n">Promise</span> <span class="o">*</span><span class="p">)</span><span class="nf">promise:</span><span class="p">(</span><span class="n">NSURLRequest</span> <span class="o">*</span><span class="p">)</span><span class="nv">request</span><span class="p">;</span>
 
 <span class="c1">// et cetera</span>
 </pre></div>
@@ -179,7 +200,7 @@ consequentively:</p>
 <span class="k">@implementation</span> <span class="nc">MyRootViewController</span>
 
 <span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">foo</span> <span class="p">{</span>
-    <span class="p">[</span><span class="n">self</span> <span class="n">promiseViewController</span><span class="o">:</span><span class="n">myDetailViewController</span> <span class="n">animated</span><span class="o">:</span><span class="nb">YES</span> <span class="n">completion</span><span class="o">:</span><span class="nb">nil</span><span class="p">];</span>
+    <span class="p">[</span><span class="n">self</span> <span class="n">promiseViewController</span><span class="o">:</span><span class="p">[</span><span class="n">MyDetailViewController</span> <span class="n">new</span><span class="p">]</span> <span class="n">animated</span><span class="o">:</span><span class="nb">YES</span> <span class="n">completion</span><span class="o">:</span><span class="nb">nil</span><span class="p">];</span>
 <span class="p">}</span>
 
 <span class="k">@end</span>
@@ -220,10 +241,35 @@ consequentively:</p>
 <a name="important-details-regarding-promises" class="anchor" href="#important-details-regarding-promises"><span class="octicon octicon-link"></span></a>Important Details Regarding “Promises”</h1>
 
 <ol>
-<li>A promise moves from its <code>unfulfilled</code> state to either <code>resolved</code> or <code>rejected</code> <em>exactly <strong>once</strong></em>.</li>
-<li>A resolved or rejected promise that is then’d or fail’d returns its already computed result.</li>
-<li>Errors bubble upwards to the first available fail handler</li>
-</ol>
+<li>A promise moves from its <code>pending</code> state to either <code>resolved</code> or <code>rejected</code> <em>exactly <strong>once</strong></em>.</li>
+<li>A resolved or rejected promise that is <code>then</code>’d or <code>fail</code>’d executes the newly provided block immediately with its already <code>resolved</code> or <code>rejected</code> value.</li>
+<li>Errors bubble upwards to the first available fail handler, then stop bubbling. Then handlers do not bubble. This is so fail handlers behave more like <code>@try</code> and <code>@catch</code>.</li>
+</ol><h1>
+<a name="but-this-isnt-promisesabdkiss" class="anchor" href="#but-this-isnt-promisesabdkiss"><span class="octicon octicon-link"></span></a>But! This isn’t Promises/A/B/D/KISS…</h1>
+
+<p>The Promises specification is a bit of a mess. As is the nature of new programming patterns, we learn best practices as we go. I've used a bunch of Promises implementations across different platforms, and have now written a few too. My experience leads me to <code>then</code> being the success handler and <code>fail</code> the fail handler with an additional handler for the <em>both</em> case (here currently <code>yolo</code>).</p>
+
+<p>We have no progress handler, because Cocoa now has <code>NSProgress</code>… so use that.</p>
+
+<h1>
+<a name="alternatives" class="anchor" href="#alternatives"><span class="octicon octicon-link"></span></a>Alternatives</h1>
+
+<p>PromiseKit is more or less unique, but the idea of <em>Promises</em> is not, and thus there are other projects to look at:</p>
+
+<ol>
+<li>Most famously is <a href="https://github.com/BoltsFramework/Bolts-iOS">Bolts</a>. I explored using this before making PromiseKit. I found that it didn’t make my code nicer than just implementing my own state machine.</li>
+<li>
+<a href="https://github.com/couchdeveloper/RXPromise">RXPromise</a> is a nice Promises implementation without any of the convenience nicities that PromiseKit provides and with the somewhat irritating condition that <code>then</code> is by default executed in a background GCD queue.</li>
+<li><a href="https://github.com/joshdholtz/ios-promises">https://github.com/joshdholtz/ios-promises</a></li>
+<li><a href="https://github.com/mproberts/objc-promise">https://github.com/mproberts/objc-promise</a></li>
+</ol><p>IMO you get the cleanest, most readable code with PromiseKit. And PromiseKit actually goes that step further and gives you tools that make using Promises with the iOS SDK <em>delightful</em>.</p>
+
+<h1>
+<a name="caveats" class="anchor" href="#caveats"><span class="octicon octicon-link"></span></a>Caveats</h1>
+
+<ul>
+<li>With Objective-C we are used to explicit types, Promises turn everything into <code>id</code>. This can be a little unnerving, but in reality is less problematic than you might expect. After all, all other common modern languages are like this.</li>
+</ul>
       </section>
     </div>
     <footer>
