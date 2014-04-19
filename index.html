@@ -27,9 +27,9 @@
         </ul>
       </header>
       <section>
-        <p>Modern development is highly asyncronous; isn’t it about time iOS developers had tools that made programming asyncronously powerful, easy and delightful?</p>
+        <p>Modern development is highly asynchronous; isn’t it about time iOS developers had tools that made programming asynchronously powerful, easy and delightful?</p>
 
-<p>PromiseKit is not just a Promises implementation, it is also a collection of helper functions that make the typical asyncronous patterns we use in iOS development delightful <em>too</em>.</p>
+<p>PromiseKit is not just a Promises implementation, it is also a collection of helper functions that make the typical asynchronous patterns we use in iOS development delightful <em>too</em>.</p>
 
 <h1>
 <a name="using-promisekit" class="anchor" href="#using-promisekit"><span class="octicon octicon-link"></span></a>Using PromiseKit</h1>
@@ -42,98 +42,92 @@
 <h1>
 <a name="what-is-a-promise" class="anchor" href="#what-is-a-promise"><span class="octicon octicon-link"></span></a>What is a Promise?</h1>
 
-<p>Synchronous code is clean code:</p>
+<p>Synchronous code is clean code. For example, showing a gravatar image:</p>
 
-<div class="highlight highlight-objc"><pre><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">setGravatarForEmail:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">email</span> <span class="p">{</span>
-    <span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span> <span class="o">=</span> <span class="n">md5</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
-    <span class="n">NSString</span> <span class="o">*</span><span class="n">url</span> <span class="o">=</span> <span class="p">[</span><span class="s">@"http://gravatar.com/avatar/%@"</span> <span class="n">stringByAppendingString</span><span class="o">:</span><span class="n">md5</span><span class="p">];</span>
-    <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSData</span> <span class="n">dataWithContentsOfURL</span><span class="o">:</span><span class="p">[</span><span class="n">NSURL</span> <span class="n">URLWithString</span><span class="o">:</span><span class="n">url</span><span class="p">]];</span>
-    <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIImage</span> <span class="n">imageWithData</span><span class="o">:</span><span class="n">data</span><span class="p">];</span>
-<span class="p">}</span>
+<div class="highlight highlight-objc"><pre><span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span> <span class="o">=</span> <span class="n">md5</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
+<span class="n">NSString</span> <span class="o">*</span><span class="n">url</span> <span class="o">=</span> <span class="p">[</span><span class="s">@"http://gravatar.com/avatar/%@"</span> <span class="n">stringByAppendingString</span><span class="o">:</span><span class="n">md5</span><span class="p">];</span>
+<span class="n">NSData</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSData</span> <span class="n">dataWithContentsOfURL</span><span class="o">:</span><span class="p">[</span><span class="n">NSURL</span> <span class="n">URLWithString</span><span class="o">:</span><span class="n">url</span><span class="p">]];</span>
+<span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIImage</span> <span class="n">imageWithData</span><span class="o">:</span><span class="n">data</span><span class="p">];</span>
 </pre></div>
 
 <p>Clean but blocking: the UI lags: the user rates you one star.</p>
 
-<p>The asyncronous analog suffers from <em>“rightward-drift”</em>:</p>
+<p>The asynchronous analog suffers from <em>rightward-drift</em>:</p>
 
-<div class="highlight highlight-objc"><pre><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">setGravatarForEmail:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">email</span> <span class="p">{</span>
-    <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_global_queue</span><span class="p">(</span><span class="n">DISPATCH_QUEUE_PRIORITY_DEFAULT</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="o">^</span><span class="p">{</span>
-        <span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span> <span class="o">=</span> <span class="n">md5</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
-        <span class="n">NSString</span> <span class="o">*</span><span class="n">url</span> <span class="o">=</span> <span class="p">[</span><span class="s">@"http://gravatar.com/avatar/%@"</span> <span class="n">stringByAppendingString</span><span class="o">:</span><span class="n">md5</span><span class="p">];</span>
-        <span class="n">NSURLRequest</span> <span class="o">*</span><span class="n">rq</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSURLRequest</span> <span class="n">requestWithURL</span><span class="o">:</span><span class="p">[</span><span class="n">NSURL</span> <span class="n">URLWithString</span><span class="o">:</span><span class="n">url</span><span class="p">]];</span>
-        <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">sendAsyncronousRequest</span><span class="o">:</span><span class="n">rq</span> <span class="n">queue</span><span class="o">:</span><span class="p">[</span><span class="n">NSOperationQueue</span> <span class="n">currentQueue</span><span class="p">]</span> <span class="n">completionHandler</span><span class="o">:^</span><span class="p">(</span><span class="n">NSURLResponse</span> <span class="o">*</span><span class="n">response</span><span class="p">,</span> <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">connectionError</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIImage</span> <span class="n">imageWithData</span><span class="o">:</span><span class="n">data</span><span class="p">];</span>
-            <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
-                <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">gravatarImage</span><span class="p">;</span>
-            <span class="p">});</span>
-        <span class="p">}];</span>
-    <span class="p">});</span>
-<span class="p">}</span>
+<div class="highlight highlight-objc"><pre><span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_global_queue</span><span class="p">(</span><span class="n">DISPATCH_QUEUE_PRIORITY_DEFAULT</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="o">^</span><span class="p">{</span>
+    <span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span> <span class="o">=</span> <span class="n">md5</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
+    <span class="n">NSString</span> <span class="o">*</span><span class="n">url</span> <span class="o">=</span> <span class="p">[</span><span class="s">@"http://gravatar.com/avatar/%@"</span> <span class="n">stringByAppendingString</span><span class="o">:</span><span class="n">md5</span><span class="p">];</span>
+    <span class="n">NSURLRequest</span> <span class="o">*</span><span class="n">rq</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSURLRequest</span> <span class="n">requestWithURL</span><span class="o">:</span><span class="p">[</span><span class="n">NSURL</span> <span class="n">URLWithString</span><span class="o">:</span><span class="n">url</span><span class="p">]];</span>
+    <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">sendAsynchronousRequest</span><span class="o">:</span><span class="n">rq</span> <span class="n">queue</span><span class="o">:</span><span class="p">[</span><span class="n">NSOperationQueue</span> <span class="n">currentQueue</span><span class="p">]</span> <span class="n">completionHandler</span><span class="o">:^</span><span class="p">(</span><span class="n">NSURLResponse</span> <span class="o">*</span><span class="n">response</span><span class="p">,</span> <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">connectionError</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIImage</span> <span class="n">imageWithData</span><span class="o">:</span><span class="n">data</span><span class="p">];</span>
+        <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
+            <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">gravatarImage</span><span class="p">;</span>
+        <span class="p">});</span>
+    <span class="p">}];</span>
+<span class="p">});</span>
 </pre></div>
 
-<p>The code that does the actual work is now buried inside asyncronicity boilerplate. It is harder to read. The code is less clean.</p>
+<p>The code that does the actual work is now buried inside asynchronicity boilerplate. It is harder to read. The code is less clean.</p>
 
-<p>A promise is an intent to accomplish an asyncronous task:</p>
+<p>Promises are chainable, standardized representations of asynchronous tasks. The equivalent code with PromiseKit looks like:</p>
 
 <div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit.h"</span>
 
-<span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">setGravatarForEmail:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">email</span> <span class="p">{</span>
-    <span class="p">[</span><span class="n">Promise</span> <span class="n">md5</span><span class="o">:</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span><span class="p">){</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://gravatar.com/avatar/%@"</span><span class="p">,</span> <span class="n">md5</span><span class="p">];</span>
-    <span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span><span class="p">){</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">gravatarImage</span><span class="p">;</span>
-    <span class="p">});</span>
-<span class="p">}</span>
+<span class="n">dispatch_promise</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+    <span class="k">return</span> <span class="n">md5</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
+<span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span><span class="p">){</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://gravatar.com/avatar/%@"</span><span class="p">,</span> <span class="n">md5</span><span class="p">];</span>
+<span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span><span class="p">){</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">gravatarImage</span><span class="p">;</span>
+<span class="p">});</span>
 </pre></div>
+
+<p>Code with promises is about as close as we can get to clean, synchronous code (at least until Apple give us <code>@await</code>…).</p>
 
 <h1>
 <a name="error-handling" class="anchor" href="#error-handling"><span class="octicon octicon-link"></span></a>Error Handling</h1>
 
-<p>Synchronous code allows us to use exceptions:</p>
+<p>Synchronous code has simple, clean error handling:</p>
 
-<div class="highlight highlight-objc"><pre><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">setGravatarForEmail:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">email</span> <span class="p">{</span>
-    <span class="k">@try</span> <span class="p">{</span>
-        <span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span> <span class="o">=</span> <span class="n">md5</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
-        <span class="n">NSString</span> <span class="o">*</span><span class="n">url</span> <span class="o">=</span> <span class="p">[</span><span class="s">@"http://gravatar.com/avatar/%@"</span> <span class="n">stringByAppendingString</span><span class="o">:</span><span class="n">md5</span><span class="p">];</span>
-        <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSData</span> <span class="n">dataWithContentsOfURL</span><span class="o">:</span><span class="p">[</span><span class="n">NSURL</span> <span class="n">URLWithString</span><span class="o">:</span><span class="n">url</span><span class="p">]];</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIImage</span> <span class="n">imageWithData</span><span class="o">:</span><span class="n">data</span><span class="p">];</span>
-    <span class="p">}</span> <span class="k">@catch</span> <span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">//TODO</span>
-    <span class="p">}</span>
+<div class="highlight highlight-objc"><pre><span class="k">@try</span> <span class="p">{</span>
+    <span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span> <span class="o">=</span> <span class="n">md5</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
+    <span class="n">NSString</span> <span class="o">*</span><span class="n">url</span> <span class="o">=</span> <span class="p">[</span><span class="s">@"http://gravatar.com/avatar/%@"</span> <span class="n">stringByAppendingString</span><span class="o">:</span><span class="n">md5</span><span class="p">];</span>
+    <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSData</span> <span class="n">dataWithContentsOfURL</span><span class="o">:</span><span class="p">[</span><span class="n">NSURL</span> <span class="n">URLWithString</span><span class="o">:</span><span class="n">url</span><span class="p">]];</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIImage</span> <span class="n">imageWithData</span><span class="o">:</span><span class="n">data</span><span class="p">];</span>
+<span class="p">}</span> <span class="k">@catch</span> <span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">//TODO</span>
 <span class="p">}</span>
 </pre></div>
 
-<p>Error handling with asyncronous code is notoriously tricky:</p>
+<p>Error handling with asynchronous code is notoriously tricky:</p>
 
-<div class="highlight highlight-objc"><pre><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">setGravatarForEmail:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">email</span> <span class="p">{</span>
-    <span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="n">errorHandler</span><span class="p">)(</span><span class="n">NSError</span> <span class="o">*</span><span class="p">)</span> <span class="o">=</span> <span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">){</span>
-        <span class="c1">//TODO</span>
-    <span class="p">};</span>
+<div class="highlight highlight-objc"><pre><span class="kt">void</span> <span class="p">(</span><span class="o">^</span><span class="n">errorHandler</span><span class="p">)(</span><span class="n">NSError</span> <span class="o">*</span><span class="p">)</span> <span class="o">=</span> <span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">){</span>
+    <span class="c1">//TODO</span>
+<span class="p">};</span>
 
-    <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_global_queue</span><span class="p">(</span><span class="n">DISPATCH_QUEUE_PRIORITY_DEFAULT</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="o">^</span><span class="p">{</span>
-        <span class="k">@try</span> <span class="p">{</span>
-            <span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span> <span class="o">=</span> <span class="n">md5</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
-            <span class="n">NSString</span> <span class="o">*</span><span class="n">url</span> <span class="o">=</span> <span class="p">[</span><span class="s">@"http://gravatar.com/avatar/%@"</span> <span class="n">stringByAppendingString</span><span class="o">:</span><span class="n">md5</span><span class="p">];</span>
-            <span class="n">NSURLRequest</span> <span class="o">*</span><span class="n">rq</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSURLRequest</span> <span class="n">requestWithURL</span><span class="o">:</span><span class="p">[</span><span class="n">NSURL</span> <span class="n">URLWithString</span><span class="o">:</span><span class="n">url</span><span class="p">]];</span>
-            <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">sendAsyncronousRequest</span><span class="o">:</span><span class="n">rq</span> <span class="n">queue</span><span class="o">:</span><span class="p">[</span><span class="n">NSOperationQueue</span> <span class="n">currentQueue</span><span class="p">]</span> <span class="n">completionHandler</span><span class="o">:^</span><span class="p">(</span><span class="n">NSURLResponse</span> <span class="o">*</span><span class="n">response</span><span class="p">,</span> <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">connectionError</span><span class="p">)</span> <span class="p">{</span>
+<span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_global_queue</span><span class="p">(</span><span class="n">DISPATCH_QUEUE_PRIORITY_DEFAULT</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="o">^</span><span class="p">{</span>
+    <span class="k">@try</span> <span class="p">{</span>
+        <span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span> <span class="o">=</span> <span class="n">md5</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
+        <span class="n">NSString</span> <span class="o">*</span><span class="n">url</span> <span class="o">=</span> <span class="p">[</span><span class="s">@"http://gravatar.com/avatar/%@"</span> <span class="n">stringByAppendingString</span><span class="o">:</span><span class="n">md5</span><span class="p">];</span>
+        <span class="n">NSURLRequest</span> <span class="o">*</span><span class="n">rq</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSURLRequest</span> <span class="n">requestWithURL</span><span class="o">:</span><span class="p">[</span><span class="n">NSURL</span> <span class="n">URLWithString</span><span class="o">:</span><span class="n">url</span><span class="p">]];</span>
+        <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">sendAsynchronousRequest</span><span class="o">:</span><span class="n">rq</span> <span class="n">queue</span><span class="o">:</span><span class="p">[</span><span class="n">NSOperationQueue</span> <span class="n">currentQueue</span><span class="p">]</span> <span class="n">completionHandler</span><span class="o">:^</span><span class="p">(</span><span class="n">NSURLResponse</span> <span class="o">*</span><span class="n">response</span><span class="p">,</span> <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">connectionError</span><span class="p">)</span> <span class="p">{</span>
 
-                <span class="c1">// the code is now misleading since exceptions thrown in this</span>
-                <span class="c1">// block will not bubble up to our @catch</span>
+            <span class="c1">// the code is now misleading since exceptions thrown in this</span>
+            <span class="c1">// block will not bubble up to our @catch</span>
 
-                <span class="k">if</span> <span class="p">(</span><span class="n">connectionError</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="n">errorHandler</span><span class="p">(</span><span class="n">connectionError</span><span class="p">);</span>
-                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                    <span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIImage</span> <span class="n">imageWithData</span><span class="o">:</span><span class="n">data</span><span class="p">];</span>
-                    <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
-                        <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
-                    <span class="p">});</span>
-                <span class="p">}</span>
-            <span class="p">}];</span>
-        <span class="p">}</span> <span class="k">@catch</span> <span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">err</span><span class="p">)</span> <span class="p">{</span>
-            <span class="n">errorHandler</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">});</span>
-<span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">connectionError</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">errorHandler</span><span class="p">(</span><span class="n">connectionError</span><span class="p">);</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIImage</span> <span class="n">imageWithData</span><span class="o">:</span><span class="n">data</span><span class="p">];</span>
+                <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
+                    <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
+                <span class="p">});</span>
+            <span class="p">}</span>
+        <span class="p">}];</span>
+    <span class="p">}</span> <span class="k">@catch</span> <span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">err</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">errorHandler</span><span class="p">(</span><span class="n">err</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">});</span>
 </pre></div>
 
 <p>Yuck! Hideous! And <em>even more</em> rightward-drift.</p>
@@ -142,65 +136,63 @@
 
 <div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit.h"</span>
 
-<span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">setGravatarForEmail:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">email</span> <span class="p">{</span>
-    <span class="p">[</span><span class="n">Promise</span> <span class="n">md5</span><span class="o">:</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span><span class="p">){</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://gravatar.com/avatar/%@"</span><span class="p">,</span> <span class="n">md5</span><span class="p">];</span>
-    <span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span><span class="p">){</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">gravatarImage</span><span class="p">;</span>
-    <span class="p">}).</span><span class="n">catch</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">){</span>
-        <span class="c1">//TODO</span>
-    <span class="p">});</span>
-<span class="p">}</span>
+<span class="n">dispatch_promise</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+    <span class="k">return</span> <span class="n">md5</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
+<span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span><span class="p">){</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://gravatar.com/avatar/%@"</span><span class="p">,</span> <span class="n">md5</span><span class="p">];</span>
+<span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span><span class="p">){</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">gravatarImage</span><span class="p">;</span>
+<span class="p">}).</span><span class="n">catch</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">){</span>
+    <span class="c1">//TODO</span>
+<span class="p">});</span>
 </pre></div>
 
 <p>Errors bubble up to the first <code>catch</code> handler in the chain.</p>
 
 <h1>
-<a name="asyncronous-state-machines" class="anchor" href="#asyncronous-state-machines"><span class="octicon octicon-link"></span></a>Asyncronous State Machines</h1>
+<a name="say-goodbye-to-asynchronous-state-machines" class="anchor" href="#say-goodbye-to-asynchronous-state-machines"><span class="octicon octicon-link"></span></a>Say Goodbye to Asynchronous State Machines</h1>
 
-<p>Promises represent the future value of a task. Our app should show a spinner until the gravatar has loaded, but only the first time. Firstly we should refactor our gravatar method to return a promise:</p>
+<p>Promises represent the future value of a task. You can add more than one <code>then</code> handler to a promise. Even after the promise has been fulfilled. If the promise already has a value, the then handler is called immediately:</p>
 
-<div class="highlight highlight-objc"><pre><span class="k">-</span> <span class="p">(</span><span class="n">Promise</span> <span class="o">*</span><span class="p">)</span><span class="nf">gravatarForEmail:</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="p">)</span><span class="nv">email</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">Promise</span> <span class="n">md5</span><span class="o">:</span><span class="n">email</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span><span class="p">){</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://gravatar.com/avatar/%@"</span><span class="p">,</span> <span class="n">md5</span><span class="p">];</span>
-    <span class="p">}).</span><span class="n">catch</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">){</span>
-        <span class="c1">//TODO</span>
-    <span class="p">});</span>
+<div class="highlight highlight-objc"><pre><span class="k">@implementation</span> <span class="nc">MyViewController</span> <span class="p">{</span>
+    <span class="n">Promise</span> <span class="o">*</span><span class="n">gravatar</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">viewDidLoad</span> <span class="p">{</span>
-    <span class="c1">// This is a property of type: `Promise *`</span>
-    <span class="n">self</span><span class="p">.</span><span class="n">gravatarPromise</span> <span class="o">=</span> <span class="p">[</span><span class="n">self</span> <span class="n">gravatarForEmail</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">email</span><span class="p">];</span>
+<span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">viewDidLoad</span> <span class="p">{</span>
+    <span class="n">gravatar</span> <span class="o">=</span> <span class="n">dispatch_promise</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+        <span class="k">return</span> <span class="n">md5</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
+    <span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span><span class="p">){</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://gravatar.com/avatar/%@"</span><span class="p">,</span> <span class="n">md5</span><span class="p">];</span>
+    <span class="p">});</span>
 
-    <span class="n">self</span><span class="p">.</span><span class="n">gravatarPromise</span><span class="p">.</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">image</span><span class="p">){</span>
-        <span class="c1">// Isn’t it nice? Promises are a consistent interface for asyncronicity!</span>
+    <span class="n">gravatar</span><span class="p">.</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">image</span><span class="p">){</span>
         <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="p">;</span>
     <span class="p">});</span>
 <span class="p">}</span>
-</pre></div>
 
-<p>We have to set another <code>UIImageView</code> to that gravatar image. Normally you would either load the gravatar again (which is inefficient) or store state about the fact the gravatar is loading and that you should wait, you would then need to react to that state in the final step of your asyncronous-block-tree-of-doom. Promises make it easy:</p>
-
-<div class="highlight highlight-objc"><pre><span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">setThatOtherImageView</span> <span class="p">{</span>
-    <span class="n">self</span><span class="p">.</span><span class="n">gravatarPromise</span><span class="p">.</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">){</span>
-        <span class="n">self</span><span class="p">.</span><span class="n">otherImageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">img</span><span class="p">;</span>
+<span class="o">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">someTimeLater</span> <span class="p">{</span>
+    <span class="n">gravatar</span><span class="p">.</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">image</span><span class="p">){</span>
+        <span class="c1">// likely called immediately, but maybe not. We don’t have to worry!</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">otherImageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="p">;</span>
     <span class="p">});</span>
 <span class="p">}</span>
+
+<span class="k">@end</span>
 </pre></div>
 
-<p>If a Promise already has a value then the then block is executed immediately. If it is still <strong><em>pending</em></strong> then the then block is executed once the Promise is <strong><em>fulfilled</em></strong>.</p>
-
-<p>A key understanding about Promises is that they can exist in two states, <em>pending</em> and <em>fulfilled</em>. The fulfilled state is either a value or an <code>NSError</code> object (Promise values are never <code>nil</code>). A Promise can move from pending to fulfilled <strong>exactly once</strong>.</p>
+<p>A key understanding is that Promises can only exist in two states, <em>pending</em> or <em>fulfilled</em>. The fulfilled state is either a value or an <code>NSError</code> object. A Promise can move from pending to fulfilled <strong>exactly once</strong>.</p>
 
 <h1>
-<a name="waiting-on-multiple-asyncronous-operations" class="anchor" href="#waiting-on-multiple-asyncronous-operations"><span class="octicon octicon-link"></span></a>Waiting on Multiple Asyncronous Operations</h1>
+<a name="waiting-on-multiple-asynchronous-operations" class="anchor" href="#waiting-on-multiple-asynchronous-operations"><span class="octicon octicon-link"></span></a>Waiting on Multiple Asynchronous Operations</h1>
 
-<p>One powerful reason to use asyncronous variants is so we can do two or more asyncronous operations simultaneously. However writing code that acts when the simultaneous operations have all completed is hard. Not so with PromiseKit:</p>
+<p>One powerful reason to use asynchronous variants is so we can do two or more asynchronous operations simultaneously. However writing code that acts when the simultaneous operations have all completed is hard. Not so with PromiseKit:</p>
 
 <div class="highlight highlight-objc"><pre><span class="kt">id</span> <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="n">url1</span><span class="p">];</span>
 <span class="kt">id</span> <span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="n">url2</span><span class="p">];</span>
+
 <span class="p">[</span><span class="n">Promise</span> <span class="n">when</span><span class="o">:</span><span class="p">@[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSArray</span> <span class="o">*</span><span class="n">results</span><span class="p">){</span>
-    <span class="c1">// do something with both </span>
+    <span class="c1">// results[0] is the result from a</span>
+    <span class="c1">// results[1] is the result from b</span>
 <span class="p">}).</span><span class="n">catch</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">){</span>
     <span class="c1">// with `when`, if any of the Promises fail, the `catch` handler is executed</span>
     <span class="n">NSArray</span> <span class="o">*</span><span class="n">suberrors</span> <span class="o">=</span> <span class="n">error</span><span class="p">.</span><span class="n">userInfo</span><span class="p">[</span><span class="n">PMKThrown</span><span class="p">];</span>
@@ -213,9 +205,16 @@
 </pre></div>
 
 <h1>
+<a name="forgiving-syntax" class="anchor" href="#forgiving-syntax"><span class="octicon octicon-link"></span></a>Forgiving Syntax</h1>
+
+<p>In case you didn't notice, the block you pass to <code>then</code> or <code>catch</code> can have return type of <code>Promise</code>, or any object, or nothing. And it can have a parameter of <code>id</code>, or a specific class type, or nothing.</p>
+
+<p>This is not usual to Objective-C or blocks. Usually everything is very explicit. We are using introspection to determine what arguments and return types you are working with. Thus, programming with PromiseKit has similarities to programming with more modern languages like Ruby or Javascript.</p>
+
+<h1>
 <a name="the-niceties" class="anchor" href="#the-niceties"><span class="octicon octicon-link"></span></a>The Niceties</h1>
 
-<p>PromiseKit aims to provide a category analog for all one-time asyncronous features in the iOS SDK (eg. not for UIButton actions, Promises fulfill <strong><em>once</em></strong> so some parts of the SDK don’t make sense as Promises—as we currently see it anyway).</p>
+<p>PromiseKit aims to provide a category analog for all one-time asynchronous features in the iOS SDK (eg. not for UIButton actions, Promises fulfill <strong><em>once</em></strong> so some parts of the SDK don’t make sense as Promises).</p>
 
 <p>An additional important consideration is that we only trigger the catch handler for errors. Thus UIAlertView does not trigger the catch handler for cancel button pushes. Initially we had it that way, and it led to error handling code that was messy and unreliable. The error path is <strong>only</strong> for errors.</p>
 
@@ -238,7 +237,7 @@
 
 <span class="c1">// Should you need to customize the HTTP headers, you can do that too:</span>
 <span class="n">NSMutableURLRequest</span> <span class="o">*</span><span class="n">rq</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSMutableURLRequest</span> <span class="n">new</span><span class="p">];</span>
-<span class="n">rq</span><span class="p">.</span><span class="n">setAllHTTPHeaders</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">headers</span><span class="p">;</span>
+<span class="n">rq</span><span class="p">.</span><span class="n">allHTTPHeaders</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">headers</span><span class="p">;</span>
 <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">promise</span><span class="o">:</span><span class="n">rq</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="err">…</span><span class="p">);</span>
 
 <span class="c1">// PromiseKit reads the response headers and tries to be helpful:</span>
@@ -290,28 +289,30 @@
 
 <span class="cp">#import "PromiseKit+UIKit.h"</span>
 
-<span class="n">UIAlertView</span> <span class="o">*</span><span class="n">alert</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIAlertView</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">initWithTitle</span><span class="o">:</span><span class="s">@"You Didn’t Save!"</span> <span class="n">message</span><span class="o">:</span> <span class="s">@"You will lose changes."</span> <span class="n">delegate</span><span class="o">:</span><span class="nb">nil</span> <span class="n">cancelButtonTitle</span><span class="o">:</span><span class="s">@"Cancel"</span> <span class="n">otherButtonTitles</span><span class="o">:</span><span class="s">@"Lose Changes"</span><span class="p">,</span> <span class="s">@"Panic"</span><span class="p">,</span> <span class="nb">nil</span><span class="p">];</span>
+<span class="n">UIAlertView</span> <span class="o">*</span><span class="n">alert</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIAlertView</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">initWithTitle</span><span class="o">:</span><span class="s">@"You Didn’t Save!"</span>
+                      <span class="nl">message:</span><span class="s">@"You will lose changes."</span>
+                     <span class="nl">delegate:</span><span class="nb">nil</span>
+            <span class="nl">cancelButtonTitle:</span><span class="s">@"Cancel"</span>
+            <span class="nl">otherButtonTitles:</span><span class="s">@"Lose Changes"</span><span class="p">,</span> <span class="s">@"Panic"</span><span class="p">,</span> <span class="nb">nil</span><span class="p">];</span>
 
 <span class="n">alert</span><span class="p">.</span><span class="n">promise</span><span class="p">.</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSNumber</span> <span class="o">*</span><span class="n">dismissedIndex</span><span class="p">){</span>
-    <span class="c1">// catch handler cannot be triggered from a UIAlertView</span>
+    <span class="c1">//…</span>
 <span class="p">});</span>
+</pre></div>
 
+<p>We provide a pattern for modally presenting ViewControllers and getting back a result:</p>
 
-<span class="cp">#import "PromiseKit+UIKit.h"</span>
-
-<span class="cm">/**</span>
-<span class="cm"> We provide a pattern for modally presenting ViewControllers:</span>
-<span class="cm">**/</span>
+<div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit+UIKit.h"</span>
 
 <span class="k">@implementation</span> <span class="nc">MyRootViewController</span>
 
 <span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">foo</span> <span class="p">{</span>
     <span class="n">UIViewController</span> <span class="o">*</span><span class="n">vc</span> <span class="o">=</span> <span class="p">[</span><span class="n">MyDetailViewController</span> <span class="n">new</span><span class="p">];</span>
     <span class="p">[</span><span class="n">self</span> <span class="n">promiseViewController</span><span class="o">:</span><span class="n">vc</span> <span class="n">animated</span><span class="o">:</span><span class="nb">YES</span> <span class="n">completion</span><span class="o">:</span><span class="nb">nil</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">result</span><span class="p">){</span>
-        <span class="c1">// the result from below in `- (void)someTimeLater`</span>
+        <span class="c1">// the result from below in `someTimeLater`</span>
         <span class="c1">// PromiseKit dismisses the MyDetailViewController instance when the</span>
         <span class="c1">// Deferred is resolved</span>
-    <span class="p">})</span>
+    <span class="p">});</span>
 <span class="p">}</span>
 
 <span class="k">@end</span>
@@ -329,12 +330,12 @@
 <span class="p">}</span>
 
 <span class="k">@end</span>
-
 </pre></div>
 
-<p>As a bonus we handle some of the tedious special ViewController types for you so you don't have to delegate. Currently just <code>MFMailComposeViewController</code>. So you can then off of it.</p>
+<p>As a bonus we handle some of the tedious special ViewController types for you so you don't have to delegate. Currently just <code>MFMailComposeViewController</code>. So you can <code>then</code> off of it without having to write any delegate code:</p>
 
-<div class="highlight highlight-objc"><pre><span class="p">[</span><span class="n">self</span> <span class="n">promiseViewController</span><span class="o">:</span><span class="n">mailer</span> <span class="n">animated</span><span class="o">:</span><span class="nb">YES</span> <span class="n">completion</span><span class="o">:</span><span class="nb">nil</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSNumber</span>  <span class="o">*</span><span class="n">num</span><span class="p">){</span>
+<div class="highlight highlight-objc"><pre><span class="kt">id</span> <span class="n">mailer</span> <span class="o">=</span> <span class="p">[</span><span class="n">MFMailComposerViewController</span> <span class="n">new</span><span class="p">];</span>
+<span class="p">[</span><span class="n">self</span> <span class="n">promiseViewController</span><span class="o">:</span><span class="n">mailer</span> <span class="n">animated</span><span class="o">:</span><span class="nb">YES</span> <span class="n">completion</span><span class="o">:</span><span class="nb">nil</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSNumber</span>  <span class="o">*</span><span class="n">num</span><span class="p">){</span>
     <span class="c1">// num is the result passed from the MFMailComposeViewControllerDelegate</span>
 <span class="p">}).</span><span class="n">catch</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
     <span class="c1">// the error from the delegate if that happened</span>
@@ -344,9 +345,16 @@
 <p>Note that simply importing <code>PromiseKit.h</code> will import everything.</p>
 
 <h1>
+<a name="promise-factories" class="anchor" href="#promise-factories"><span class="octicon octicon-link"></span></a>Promise Factories</h1>
+
+<p>With the next version of Promise Kit we plan to add a Promise-Factory type feature so we can have promises generated from <code>NSNotificationCenter</code> and <code>UIControl</code>s and that sort of thing. It doesn't make sense to have plain promises because Promises can only be fulfilled once.</p>
+
+<p>PromiseKit aims to be a complete and delightful addition to your toolkit.</p>
+
+<h1>
 <a name="deferred" class="anchor" href="#deferred"><span class="octicon octicon-link"></span></a>Deferred</h1>
 
-<p>If you want to write your own methods that return Promises then often you will need a <code>Deferred</code> object. Promises are deliberately opaque; we don’t want other parts of our codebase modifying their values.</p>
+<p>If you want to write your own methods that return Promises then often you will need a <code>Deferred</code> object. Promises are deliberately opaque: you can't directly modify them, only their parent promise can.</p>
 
 <p>A <code>Deferred</code> has a promise, and using a <code>Deferred</code> you can set that Promise's value, the Deferred then recursively calls any sub-promises. For example:</p>
 
@@ -357,7 +365,7 @@
         <span class="n">NSMutableArray</span> <span class="o">*</span><span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSMutableArray</span> <span class="n">new</span><span class="p">];</span>
         <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">10000</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span>
             <span class="p">[</span><span class="n">numbers</span> <span class="n">addObject</span><span class="o">:</span><span class="p">@(</span><span class="n">arc4random</span><span class="p">())];</span>
-        <span class="n">dispatch</span><span class="p">)</span><span class="n">async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
+        <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">logic</span><span class="p">)</span> <span class="p">{</span>
                 <span class="p">[</span><span class="n">d</span> <span class="n">resolve</span><span class="o">:</span><span class="n">numbers</span><span class="p">];</span>
             <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
@@ -375,6 +383,20 @@
     <span class="p">});</span>
 <span class="p">}</span>
 </pre></div>
+
+<p>Although for the common case of an operation that runs in the background we offer the convenience function <code>dispatch_promise</code>, which is like <code>dispatch_async</code>, but returns a Promise (which continues on the main queue). So the above would be:</p>
+
+<div class="highlight highlight-objc"><pre><span class="k">-</span> <span class="p">(</span><span class="n">Promise</span> <span class="o">*</span><span class="p">)</span><span class="nf">tenThousandRandomNumbers</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">dispatch_promise</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+        <span class="n">NSMutableArray</span> <span class="o">*</span><span class="n">numbers</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSMutableArray</span> <span class="n">new</span><span class="p">];</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">10000</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span>
+            <span class="p">[</span><span class="n">numbers</span> <span class="n">addObject</span><span class="o">:</span><span class="p">@(</span><span class="n">arc4random</span><span class="p">())];</span>
+        <span class="k">return</span> <span class="n">numbers</span><span class="p">;</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+
+<p><code>dispatch_promise</code> runs on <code>DISPATCH_QUEUE_PRIORITY_DEFAULT</code>. If you want other queue priorities then write your own dispatch wrapper around a <code>Deferred</code>.</p>
 
 <h1>
 <a name="the-fine-print" class="anchor" href="#the-fine-print"><span class="octicon octicon-link"></span></a>The Fine Print</h1>
@@ -395,7 +417,7 @@
 
 <ul>
 <li>We are version 0.9 and thus reserve the right to remove API before 1.0. Probably we won’t, we’re just being cautious.</li>
-<li>PromiseKit is not thread-safe. This is not intentional, we will fix that. Though considering the immutability of Promises, I can’t actually think of an instance where this would be a problem. Really your only concern is to ensure that you return from your <code>then</code> handlers in the thread you want subsequent handlers to be run.</li>
+<li>PromiseKit is not thread-safe. This is not intentional, we will fix that. Though in general use it isn't common to compromise the thread-safety of PromiseKit. So just ensure you are happy with the thread any Deferreds are resolved upon.</li>
 </ul><h1>
 <a name="todo" class="anchor" href="#todo"><span class="octicon octicon-link"></span></a>TODO</h1>
 
