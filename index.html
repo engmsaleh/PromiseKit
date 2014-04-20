@@ -72,7 +72,7 @@
     <span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span> <span class="o">=</span> <span class="n">md5</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
     <span class="n">NSString</span> <span class="o">*</span><span class="n">url</span> <span class="o">=</span> <span class="p">[</span><span class="s">@"http://gravatar.com/avatar/%@"</span> <span class="n">stringByAppendingString</span><span class="o">:</span><span class="n">md5</span><span class="p">];</span>
     <span class="n">NSURLRequest</span> <span class="o">*</span><span class="n">rq</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSURLRequest</span> <span class="n">requestWithURL</span><span class="o">:</span><span class="p">[</span><span class="n">NSURL</span> <span class="n">URLWithString</span><span class="o">:</span><span class="n">url</span><span class="p">]];</span>
-    <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">sendAsynchronousRequest</span><span class="o">:</span><span class="n">rq</span> <span class="n">queue</span><span class="o">:</span><span class="p">[</span><span class="n">NSOperationQueue</span> <span class="n">currentQueue</span><span class="p">]</span> <span class="n">completionHandler</span><span class="o">:^</span><span class="p">(</span><span class="n">NSURLResponse</span> <span class="o">*</span><span class="n">response</span><span class="p">,</span> <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">connectionError</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">sendAsynchronousRequest</span><span class="o">:</span><span class="n">rq</span> <span class="n">queue</span><span class="o">:</span><span class="p">[</span><span class="n">NSOperationQueue</span> <span class="n">mainQueue</span><span class="p">]</span> <span class="n">completionHandler</span><span class="o">:^</span><span class="p">(</span><span class="n">NSURLResponse</span> <span class="o">*</span><span class="n">response</span><span class="p">,</span> <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">connectionError</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span> <span class="o">=</span> <span class="p">[</span><span class="n">UIImage</span> <span class="n">imageWithData</span><span class="o">:</span><span class="n">data</span><span class="p">];</span>
         <span class="n">dispatch_async</span><span class="p">(</span><span class="n">dispatch_get_main_queue</span><span class="p">(),</span> <span class="o">^</span><span class="p">{</span>
             <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">gravatarImage</span><span class="p">;</span>
@@ -124,7 +124,7 @@
         <span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span> <span class="o">=</span> <span class="n">md5</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
         <span class="n">NSString</span> <span class="o">*</span><span class="n">url</span> <span class="o">=</span> <span class="p">[</span><span class="s">@"http://gravatar.com/avatar/%@"</span> <span class="n">stringByAppendingString</span><span class="o">:</span><span class="n">md5</span><span class="p">];</span>
         <span class="n">NSURLRequest</span> <span class="o">*</span><span class="n">rq</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSURLRequest</span> <span class="n">requestWithURL</span><span class="o">:</span><span class="p">[</span><span class="n">NSURL</span> <span class="n">URLWithString</span><span class="o">:</span><span class="n">url</span><span class="p">]];</span>
-        <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">sendAsynchronousRequest</span><span class="o">:</span><span class="n">rq</span> <span class="n">queue</span><span class="o">:</span><span class="p">[</span><span class="n">NSOperationQueue</span> <span class="n">currentQueue</span><span class="p">]</span> <span class="n">completionHandler</span><span class="o">:^</span><span class="p">(</span><span class="n">NSURLResponse</span> <span class="o">*</span><span class="n">response</span><span class="p">,</span> <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">connectionError</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">sendAsynchronousRequest</span><span class="o">:</span><span class="n">rq</span> <span class="n">queue</span><span class="o">:</span><span class="p">[</span><span class="n">NSOperationQueue</span> <span class="n">mainQueue</span><span class="p">]</span> <span class="n">completionHandler</span><span class="o">:^</span><span class="p">(</span><span class="n">NSURLResponse</span> <span class="o">*</span><span class="n">response</span><span class="p">,</span> <span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">connectionError</span><span class="p">)</span> <span class="p">{</span>
 
             <span class="c1">// the code is now misleading since exceptions thrown in this</span>
             <span class="c1">// block will not bubble up to our @catch</span>
@@ -232,44 +232,61 @@
 
 <p>An additional important consideration is that we only trigger the catch handler for errors. Thus UIAlertView does not trigger the catch handler for cancel button pushes. Initially we had it that way, and it led to error handling code that was messy and unreliable. The error path is <strong>only</strong> for errors.</p>
 
-<p>We have categories for <code>NSURLConnection</code></p>
+<h2>
+<a name="nsurlconnectionpromisekit" class="anchor" href="#nsurlconnectionpromisekit"><span class="octicon octicon-link"></span></a>NSURLConnection+PromiseKit</h2>
 
 <div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit+Foundation.h"</span>
 
-<span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="p">[</span><span class="n">NSURL</span> <span class="n">URLWithString</span><span class="o">:</span><span class="s">@"http://promisekit.org"</span><span class="p">]].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">){</span>
+<span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://promisekit.org"</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSData</span> <span class="o">*</span><span class="n">data</span><span class="p">){</span>
 
 <span class="p">}).</span><span class="n">catch</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">){</span>
     <span class="n">NSHTTPURLResponse</span> <span class="o">*</span><span class="n">rsp</span> <span class="o">=</span> <span class="n">error</span><span class="p">.</span><span class="n">userInfo</span><span class="p">[</span><span class="n">PMKURLErrorFailingURLResponse</span><span class="p">];</span>
     <span class="kt">int</span> <span class="n">HTTPStatusCode</span> <span class="o">=</span> <span class="n">rsp</span><span class="p">.</span><span class="n">statuscode</span><span class="p">;</span>
 <span class="p">});</span>
-
-<span class="c1">// Convenience for the common need to create a URL from a string format:</span>
-<span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://google.com/%@"</span><span class="p">,</span> <span class="n">folder</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="err">…</span><span class="p">);</span>
-
-<span class="c1">// We can create the query string for you</span>
-<span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://google.com"</span> <span class="n">query</span><span class="o">:</span><span class="p">@{</span><span class="s">@"foo"</span><span class="o">:</span> <span class="s">@"bar"</span><span class="p">}].</span><span class="n">then</span><span class="p">(</span><span class="err">…</span><span class="p">);</span>
-
-<span class="c1">// Should you need to customize the HTTP headers, you can do that too:</span>
-<span class="n">NSMutableURLRequest</span> <span class="o">*</span><span class="n">rq</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSMutableURLRequest</span> <span class="n">new</span><span class="p">];</span>
-<span class="n">rq</span><span class="p">.</span><span class="n">allHTTPHeaders</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">headers</span><span class="p">;</span>
-<span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">promise</span><span class="o">:</span><span class="n">rq</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="err">…</span><span class="p">);</span>
-
-<span class="c1">// PromiseKit reads the response headers and tries to be helpful:</span>
-
-<span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://placekitten.org/100/100"</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">image</span><span class="p">){</span>
-    <span class="c1">// Indeed! Pre-converted to a UIImage in a background thread!</span>
-<span class="p">});</span>
-
-<span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://example.com/some.json"</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSDictionary</span> <span class="o">*</span><span class="n">json</span><span class="p">){</span>
-    <span class="c1">// Indeed! Pre-deserialized from JSON in a background thread!</span>
-<span class="p">});</span>
-
-<span class="c1">// otherwise you get the raw `NSData *`</span>
-
-<span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">POST</span><span class="o">:</span><span class="s">@"http://example.com/%@"</span><span class="p">,</span> <span class="n">destination</span> <span class="n">formURLEncodedParameters</span><span class="o">:</span><span class="p">@{</span><span class="s">@"key"</span><span class="o">:</span> <span class="s">@"value"</span><span class="p">}].</span><span class="n">then</span><span class="p">(</span><span class="err">…</span><span class="p">)</span>
 </pre></div>
 
-<p>Sometimes you just want to query the NSURLCache because doing an NSURLConnection will take too long and just return the same data anyway. We perform the same header analysis as the NSURLConnection categories, so eg. you will get back a <code>UIImage *</code> or whatever. If there is nothing in the cache, then you get back nil.</p>
+<p>And a convenience string format variant:</p>
+
+<div class="highlight highlight-objc"><pre><span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://example.com/%@"</span><span class="p">,</span> <span class="n">folder</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+    <span class="c1">//…</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>And a variant that constructs a correctly URL encoded query string from a dictionary:</p>
+
+<div class="highlight highlight-objc"><pre><span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://example.com"</span> <span class="n">query</span><span class="o">:</span><span class="p">@{</span><span class="s">@"foo"</span><span class="o">:</span> <span class="s">@"bar"</span><span class="p">}].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+    <span class="c1">//…</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>And a POST variant:</p>
+
+<div class="highlight highlight-objc"><pre><span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">POST</span><span class="o">:</span><span class="s">@"http://example.com"</span> <span class="n">formURLEncodedParameters</span><span class="o">:</span><span class="p">@{</span><span class="s">@"key"</span><span class="o">:</span> <span class="s">@"value"</span><span class="p">}].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+    <span class="c1">//…</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>PromiseKit reads the response headers and tries to be helpful:</p>
+
+<div class="highlight highlight-objc"><pre><span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://example.com/some.json"</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSDictionary</span> <span class="o">*</span><span class="n">json</span><span class="p">){</span>
+    <span class="k">if</span> <span class="p">([</span><span class="n">json</span> <span class="n">isKindOfClass</span><span class="o">:</span><span class="p">[</span><span class="n">NSDictionary</span> <span class="n">class</span><span class="p">]])</span> <span class="p">{</span>
+        <span class="n">NSLog</span><span class="p">(</span><span class="s">@"Yes! Indeed, we converted the JSON data into an NSDictionary for you!"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://placekitten.org/100/100"</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">image</span><span class="p">){</span>
+    <span class="k">if</span> <span class="p">([</span><span class="n">image</span> <span class="n">isKindOfClass</span><span class="o">:</span><span class="p">[</span><span class="n">UIImage</span> <span class="n">class</span><span class="p">]])</span> <span class="p">{</span>
+        <span class="n">NSLog</span><span class="p">(</span><span class="s">@"Yes! Indeed, we converted the data into a UIImage for you!"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>Otherwise we return the raw <code>NSData</code>.</p>
+
+<h2>
+<a name="nsurlcachepromisekit" class="anchor" href="#nsurlcachepromisekit"><span class="octicon octicon-link"></span></a>NSURLCache+PromiseKit</h2>
+
+<p>Sometimes you just want to query the <code>NSURLCache</code> because doing an <code>NSURLConnection</code> will take too long and just return the same data anyway. We perform the same header analysis as the <code>NSURLConnection</code> categories, so eg. you will get back a <code>UIImage *</code> or whatever. If there is nothing in the cache, then you get back <code>nil</code>.</p>
 
 <div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit+Foundation.h"</span>
 
@@ -278,6 +295,9 @@
 <span class="p">});</span>
 </pre></div>
 
+<h2>
+<a name="cllocationmanagerpromisekit" class="anchor" href="#cllocationmanagerpromisekit"><span class="octicon octicon-link"></span></a>CLLocationManager+PromiseKit</h2>
+
 <p>A promise for a one time update of the user’s location:</p>
 
 <div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit+CoreLocation.h"</span>
@@ -285,6 +305,9 @@
 <span class="p">[</span><span class="n">CLLocationManager</span> <span class="n">promise</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">CLLocation</span> <span class="o">*</span><span class="n">currentUserLocation</span><span class="p">){</span>
 <span class="p">});</span>
 </pre></div>
+
+<h2>
+<a name="uialertviewpromisekit" class="anchor" href="#uialertviewpromisekit"><span class="octicon octicon-link"></span></a>UIAlertView+PromiseKit</h2>
 
 <p>A promise for showing a <code>UIAlertView</code>:</p>
 
@@ -300,6 +323,14 @@
     <span class="c1">//…</span>
 <span class="p">});</span>
 </pre></div>
+
+<h2>
+<a name="uiactionsheetpromisekit" class="anchor" href="#uiactionsheetpromisekit"><span class="octicon octicon-link"></span></a>UIActionSheet+PromiseKit</h2>
+
+<p>Same pattern as for <code>UIAlertView</code>.</p>
+
+<h2>
+<a name="uiviewcontrollerpromisekit" class="anchor" href="#uiviewcontrollerpromisekit"><span class="octicon octicon-link"></span></a>UIViewController+PromiseKit</h2>
 
 <p>We provide a pattern for modally presenting ViewControllers and getting back a result:</p>
 
