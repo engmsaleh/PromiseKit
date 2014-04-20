@@ -31,12 +31,26 @@
 
 <p>PromiseKit is not just a Promises implementation, it is also a collection of helper functions that make the typical asynchronous patterns we use in iOS development delightful <em>too</em>.</p>
 
+<p>PromiseKit is also designed to be integrated into other CocoaPods. If your library has asyncronous operations and you like PromiseKit, then add an opt-in subspec that provides Promises for your users. HOWTO provided later in this README.</p>
+
 <h1>
 <a name="using-promisekit" class="anchor" href="#using-promisekit"><span class="octicon octicon-link"></span></a>Using PromiseKit</h1>
 
 <p>In your <a href="http://guides.cocoapods.org/using/the-podfile.html">Podfile</a>:</p>
 
 <div class="highlight highlight-ruby"><pre><span class="n">pod</span> <span class="s1">'PromiseKit'</span>
+</pre></div>
+
+<p>PromiseKit is modulized. If you don’t want any of our category additions:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">pod</span> <span class="s1">'PromiseKit/base'</span>
+</pre></div>
+
+<p>Or if you only want some of our categories:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">pod</span> <span class="s1">'PromiseKit/Foundation'</span>
+<span class="n">pod</span> <span class="s1">'PromiseKit/UIKit'</span>
+<span class="n">pod</span> <span class="s1">'PromiseKit/CoreLocation'</span>
 </pre></div>
 
 <h1>
@@ -218,7 +232,7 @@
 
 <p>An additional important consideration is that we only trigger the catch handler for errors. Thus UIAlertView does not trigger the catch handler for cancel button pushes. Initially we had it that way, and it led to error handling code that was messy and unreliable. The error path is <strong>only</strong> for errors.</p>
 
-<p>So far we have:</p>
+<p>We have categories for <code>NSURLConnection</code></p>
 
 <div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit+Foundation.h"</span>
 
@@ -253,33 +267,28 @@
 <span class="c1">// otherwise you get the raw `NSData *`</span>
 
 <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">POST</span><span class="o">:</span><span class="s">@"http://example.com/%@"</span><span class="p">,</span> <span class="n">destination</span> <span class="n">formURLEncodedParameters</span><span class="o">:</span><span class="p">@{</span><span class="s">@"key"</span><span class="o">:</span> <span class="s">@"value"</span><span class="p">}].</span><span class="n">then</span><span class="p">(</span><span class="err">…</span><span class="p">)</span>
+</pre></div>
 
+<p>Sometimes you just want to query the NSURLCache because doing an NSURLConnection will take too long and just return the same data anyway. We perform the same header analysis as the NSURLConnection categories, so eg. you will get back a <code>UIImage *</code> or whatever. If there is nothing in the cache, then you get back nil.</p>
 
+<div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit+Foundation.h"</span>
 
-<span class="cp">#import "PromiseKit+Foundation.h"</span>
-
-<span class="cm">/**</span>
-<span class="cm"> Sometimes you just want to query the NSURLCache because doing an</span>
-<span class="cm"> NSURLConnection will take too long and just return the same data anyway. We</span>
-<span class="cm"> perform the same header analysis as the NSURLConnection categories, so eg. you</span>
-<span class="cm"> will get back a `UIImage *` or whatever. If there is nothing in the cache, then</span>
-<span class="cm"> you get back nil.</span>
-<span class="cm">**/</span>
 <span class="p">[[</span><span class="n">NSURLCache</span> <span class="n">sharedURLCache</span><span class="p">]</span> <span class="n">promisedResponseForRequest</span><span class="o">:</span><span class="n">rq</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">o</span><span class="p">){</span>
     <span class="k">return</span> <span class="n">o</span> <span class="o">?:</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="n">rq</span><span class="p">];</span>
 <span class="p">});</span>
+</pre></div>
 
+<p>A promise for a one time update of the user’s location:</p>
 
-
-<span class="cp">#import "PromiseKit+CoreLocation.h"</span>
+<div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit+CoreLocation.h"</span>
 
 <span class="p">[</span><span class="n">CLLocationManager</span> <span class="n">promise</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">CLLocation</span> <span class="o">*</span><span class="n">currentUserLocation</span><span class="p">){</span>
-    <span class="c1">// If you need the user Location just once, then now you have it</span>
 <span class="p">});</span>
+</pre></div>
 
+<p>A promise for showing a <code>UIAlertView</code>:</p>
 
-
-<span class="cp">#import "PromiseKit+UIKit.h"</span>
+<div class="highlight highlight-objc"><pre><span class="cp">#import "PromiseKit+UIKit.h"</span>
 
 <span class="n">UIAlertView</span> <span class="o">*</span><span class="n">alert</span> <span class="o">=</span> <span class="p">[[</span><span class="n">UIAlertView</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">initWithTitle</span><span class="o">:</span><span class="s">@"You Didn’t Save!"</span>
                       <span class="nl">message:</span><span class="s">@"You will lose changes."</span>
@@ -405,17 +414,97 @@
 <li>Nothing happens if you add a <code>then</code> to a failed Promise</li>
 <li>Adding a <code>catch</code> handler to a failed Promise will execute that fail handler: this is converse to adding the same to a <strong>pending</strong> Promise.</li>
 </ul><h1>
+<a name="adding-promises-to-third-party-libraries" class="anchor" href="#adding-promises-to-third-party-libraries"><span class="octicon octicon-link"></span></a>Adding Promises to Third Party Libraries</h1>
+
+<p>It would be great if every library with asynchronous functionality would offer opt-in <code>Promise *</code> variants for the asynchronous mechanisms.</p>
+
+<p>Should you want to add PromiseKit integration to your library, the general premise is to add an opt-in <code>subspec</code> to your <code>podspec</code> that provides methods that return <code>Promise</code>s. For example if we imagine a library that overlays a kitten on an image:</p>
+
+<div class="highlight highlight-objc"><pre><span class="k">@interface</span> <span class="nc">ABCKitten</span>
+<span class="k">-</span> <span class="p">(</span><span class="n">instancetype</span><span class="p">)</span><span class="nf">initWithImage:</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="p">)</span><span class="nv">image</span><span class="p">;</span>
+<span class="k">-</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">overlayKittenWithCompletionBlock:</span><span class="p">(</span><span class="kt">void</span><span class="p">)(</span><span class="o">^</span><span class="p">)(</span><span class="n">UIImage</span> <span class="o">*</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="p">))</span><span class="nv">completionBlock</span><span class="p">;</span>
+<span class="k">@end</span>
+</pre></div>
+
+<p>Opt-in PromiseKit support would include a new file <code>ABCKitten+PromiseKit.h</code>:</p>
+
+<div class="highlight highlight-objc"><pre><span class="cp">#import &lt;PromiseKit/Promise.h&gt;</span>
+<span class="cp">#import "ABCKitten.h"</span>
+
+
+<span class="k">@interface</span> <span class="nc">ABCKitten</span> <span class="nl">(PromiseKit)</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Returns a Promise that overlays a kitten image.</span>
+<span class="cm"> * @return A Promise that will then a `UIImage *` object.</span>
+<span class="cm"> */</span>
+<span class="k">-</span> <span class="p">(</span><span class="n">Promise</span> <span class="o">*</span><span class="p">)</span><span class="nf">overlayKitten</span><span class="p">;</span>
+
+<span class="k">@end</span>
+</pre></div>
+
+<p>It's crucially important to document your Promise methods <a href="http://nshipster.com/documentation/">properly</a>, because the result of a Promise can be any object type and your users need to be able to easily look up the types by ⌥ clicking the method.</p>
+
+<p>Consumers of your library would then include in their <code>Podfile</code>:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">pod</span> <span class="s1">'ABCKitten/PromiseKit'</span>
+</pre></div>
+
+<p>This is the “opt-in” step.</p>
+
+<p>Finally you need to modify your <code>podspec</code>. If it was something like this:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="no">Pod</span><span class="o">::</span><span class="no">Spec</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">name</span>         <span class="o">=</span> <span class="s2">"ABCKitten"</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">version</span>      <span class="o">=</span> <span class="s2">"1.1"</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">source_files</span> <span class="o">=</span> <span class="s1">'ABCKitten.{m,h}'</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>Then you would need to convert it to the following:</p>
+
+<div class="highlight highlight-ruby"><pre><span class="no">Pod</span><span class="o">::</span><span class="no">Spec</span><span class="o">.</span><span class="n">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">name</span>         <span class="o">=</span> <span class="s2">"ABCKitten"</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">version</span>      <span class="o">=</span> <span class="s2">"1.1"</span>
+
+  <span class="n">s</span><span class="o">.</span><span class="n">default_subspec</span> <span class="o">=</span> <span class="s1">'base'</span>
+
+  <span class="n">s</span><span class="o">.</span><span class="n">subspec</span> <span class="s1">'base'</span> <span class="k">do</span> <span class="o">|</span><span class="n">ss</span><span class="o">|</span>
+    <span class="n">ss</span><span class="o">.</span><span class="n">source_files</span> <span class="o">=</span> <span class="s1">'ABCKitten.{m,h}'</span>
+  <span class="k">end</span>
+
+  <span class="n">s</span><span class="o">.</span><span class="n">subspec</span> <span class="s1">'PromiseKit'</span> <span class="k">do</span> <span class="o">|</span><span class="n">ss</span><span class="o">|</span>
+    <span class="n">ss</span><span class="o">.</span><span class="n">dependency</span> <span class="s1">'PromiseKit/base'</span><span class="p">,</span> <span class="s1">'ABCKitten/base'</span>
+    <span class="n">ss</span><span class="o">.</span><span class="n">source_files</span> <span class="o">=</span> <span class="s1">'ABCKitten+PromiseKit.{m,h}'</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>As a further example, the actual implementation of <code>- (Promise *)overlayKitten</code> would likely be as simple as this:</p>
+
+<div class="highlight highlight-objc"><pre><span class="k">-</span> <span class="p">(</span><span class="n">Promise</span> <span class="o">*</span><span class="p">)</span><span class="nf">overlayKitten</span> <span class="p">{</span>
+    <span class="n">Deferred</span> <span class="o">*</span><span class="n">deferred</span> <span class="o">=</span> <span class="p">[</span><span class="n">Deferred</span> <span class="n">new</span><span class="p">];</span>
+    <span class="p">[</span><span class="n">self</span> <span class="n">overlayKittenWithCompletionBlock</span><span class="o">:^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">img</span><span class="p">,</span> <span class="n">NSError</span> <span class="o">*</span><span class="n">err</span><span class="p">){</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="p">[</span><span class="n">deferred</span> <span class="n">reject</span><span class="o">:</span><span class="n">err</span><span class="p">];</span>
+        <span class="k">else</span>
+            <span class="p">[</span><span class="n">deferred</span> <span class="n">resolve</span><span class="o">:</span><span class="n">img</span><span class="p">];</span>
+    <span class="p">}];</span>
+    <span class="k">return</span> <span class="n">deferred</span><span class="p">.</span><span class="n">promise</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<h1>
+<a name="adding-promisekit-to-someone-elses-pod" class="anchor" href="#adding-promisekit-to-someone-elses-pod"><span class="octicon octicon-link"></span></a>Adding PromiseKit to Someone Else’s Pod</h1>
+
+<p>Firstly you should try submitting the above to the project itself. If they won’t add it then you'll need to make your own pod. Use the naming scheme: <code>ABCKitten+PromiseKit</code>.</p>
+
+<h1>
 <a name="caveats" class="anchor" href="#caveats"><span class="octicon octicon-link"></span></a>Caveats</h1>
 
 <ul>
 <li>We are version 0.9 and thus reserve the right to remove API before 1.0. Probably we won’t, we’re just being cautious.</li>
 <li>PromiseKit is not thread-safe. This is not intentional, we will fix that. Though in general use it isn't common to compromise the thread-safety of PromiseKit. So just ensure you are happy with the thread any Deferreds are resolved upon.</li>
-</ul><h1>
-<a name="todo" class="anchor" href="#todo"><span class="octicon octicon-link"></span></a>TODO</h1>
-
-<ul>
-<li>Make all categories into optional CocoaPod sub-modules</li>
-<li>Complete categorization of the iOS SDK</li>
 </ul>
       </section>
     </div>
