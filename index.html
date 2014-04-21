@@ -230,7 +230,7 @@
 
 <p>PromiseKit aims to provide a category analog for all one-time asynchronous features in the iOS SDK (eg. not for UIButton actions, Promises fulfill <strong><em>once</em></strong> so some parts of the SDK don’t make sense as Promises).</p>
 
-<p>An additional important consideration is that we only trigger the catch handler for errors. Thus UIAlertView does not trigger the catch handler for cancel button pushes. Initially we had it that way, and it led to error handling code that was messy and unreliable. The error path is <strong>only</strong> for errors.</p>
+<p>An additional important consideration is that we only trigger the catch handler for errors. Thus <code>UIAlertView</code> does not trigger the catch handler for cancel button pushes. Initially we had it that way, and it led to error handling code that was messy and unreliable. The error path is <strong>only</strong> for errors.</p>
 
 <h2>
 <a name="nsurlconnectionpromisekit" class="anchor" href="#nsurlconnectionpromisekit"><span class="octicon octicon-link"></span></a>NSURLConnection+PromiseKit</h2>
