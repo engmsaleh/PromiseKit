@@ -531,11 +531,24 @@
 <p>Firstly you should try submitting the above to the project itself. If they won’t add it then you'll need to make your own pod. Use the naming scheme: <code>ABCKitten+PromiseKit</code>.</p>
 
 <h1>
+<a name="why-promisekit" class="anchor" href="#why-promisekit"><span class="octicon octicon-link"></span></a>Why PromiseKit?</h1>
+
+<p>There are other Promise implementations for iOS, but in this author’s opinion, none of them are as pleasant to use as PromiseKit.</p>
+
+<ul>
+<li>
+<a href="https://github.com/BoltsFramework/Bolts-iOS">Bolts</a> was the inspiration for PromiseKit. I thought that—finally—someone had written a decent Promises implementation for iOS. The lack of dedicated <code>catch</code> handler, the very ugly syntax and the overly complex design was a disappointment. You may like it, and certainly it is backed by big names™. Fundamentally, Promise-type implementations are not hard to write, so you really are making a decision based on how flexible the API is while simulatenously producing readable, clean code. I have worked hard to make PromiseKit the best choice.</li>
+<li>
+<a href="https://github.com/couchdeveloper/RXPromise">RXPromise</a> is an excellent Promise implementation that is mostly let down by syntax choices. By default thens are executed in background threads, which usually is inconvenient. <code>then</code> always return <code>id</code> and always take <code>id</code>, which makes code less elegant. There is no explicit <code>catch</code>, instead <code>then</code> always takes two blocks, the second being the error handler, which is ugly. The interface for <code>Promise</code> allows any caller to resolve it breaking encapsulation. Otherwise an excellent implementation.</li>
+<li><a href="http://cocoapods.org/?q=promise">Many others</a></li>
+</ul><p>PromiseKit is well tested, and inside apps on the store. It also is fully documented, even within Xcode (⌥ click any method).</p>
+
+<h1>
 <a name="caveats" class="anchor" href="#caveats"><span class="octicon octicon-link"></span></a>Caveats</h1>
 
 <ul>
-<li>We are version 0.9 and thus reserve the right to remove API before 1.0. Probably we won’t, we’re just being cautious.</li>
-<li>PromiseKit is not thread-safe. This is not intentional, we will fix that. Though in general use it isn't common to compromise the thread-safety of PromiseKit. So just ensure you are happy with the thread any Deferreds are resolved upon.</li>
+<li>We are version 0.9 and thus reserve the right to remove API before 1.0. Probably we won’t; we’re just being prudent by stating this advisory.</li>
+<li>PromiseKit is not thread-safe. This is not intentional, we will fix that. However, in practice the only way to compromise PromiseKit is to keep a pointer to an unresolved Promise and use that from multiple threads. You can execute thens in many different contexts and the underlying immutability of Promises means PromiseKit is inherently thread-safe.</li>
 </ul>
       </section>
     </div>
