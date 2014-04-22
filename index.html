@@ -228,11 +228,11 @@
 <p>So, these are all valid:</p>
 
 <div class="highlight highlight-objc"><pre><span class="n">myPromise</span><span class="p">.</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
-    <span class="c1">//noop</span>
+    <span class="c1">//…</span>
 <span class="p">});</span>
 
 <span class="n">myPromise</span><span class="p">.</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">obj</span><span class="p">){</span>
-    <span class="c1">//noop</span>
+    <span class="c1">//…</span>
 <span class="p">});</span>
 
 <span class="n">myPromise</span><span class="p">.</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="kt">id</span> <span class="n">obj</span><span class="p">){</span>
@@ -264,7 +264,7 @@
 
 <span class="p">}).</span><span class="n">catch</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">){</span>
     <span class="n">NSHTTPURLResponse</span> <span class="o">*</span><span class="n">rsp</span> <span class="o">=</span> <span class="n">error</span><span class="p">.</span><span class="n">userInfo</span><span class="p">[</span><span class="n">PMKURLErrorFailingURLResponse</span><span class="p">];</span>
-    <span class="kt">int</span> <span class="n">HTTPStatusCode</span> <span class="o">=</span> <span class="n">rsp</span><span class="p">.</span><span class="n">statuscode</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">HTTPStatusCode</span> <span class="o">=</span> <span class="n">rsp</span><span class="p">.</span><span class="n">statusCode</span><span class="p">;</span>
 <span class="p">});</span>
 </pre></div>
 
@@ -292,15 +292,11 @@
 <p>PromiseKit reads the response headers and tries to be helpful:</p>
 
 <div class="highlight highlight-objc"><pre><span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://example.com/some.json"</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSDictionary</span> <span class="o">*</span><span class="n">json</span><span class="p">){</span>
-    <span class="k">if</span> <span class="p">([</span><span class="n">json</span> <span class="n">isKindOfClass</span><span class="o">:</span><span class="p">[</span><span class="n">NSDictionary</span> <span class="n">class</span><span class="p">]])</span> <span class="p">{</span>
-        <span class="n">NSLog</span><span class="p">(</span><span class="s">@"Yes! Indeed, we converted the JSON data into an NSDictionary for you!"</span><span class="p">);</span>
-    <span class="p">}</span>
+    <span class="n">assert</span><span class="p">([</span><span class="n">json</span> <span class="n">isKindOfClass</span><span class="o">:</span><span class="p">[</span><span class="n">NSDictionary</span> <span class="n">class</span><span class="p">]]);</span>
 <span class="p">});</span>
 
 <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://placekitten.org/100/100"</span><span class="p">].</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">image</span><span class="p">){</span>
-    <span class="k">if</span> <span class="p">([</span><span class="n">image</span> <span class="n">isKindOfClass</span><span class="o">:</span><span class="p">[</span><span class="n">UIImage</span> <span class="n">class</span><span class="p">]])</span> <span class="p">{</span>
-        <span class="n">NSLog</span><span class="p">(</span><span class="s">@"Yes! Indeed, we converted the data into a UIImage for you!"</span><span class="p">);</span>
-    <span class="p">}</span>
+    <span class="n">assert</span><span class="p">([</span><span class="n">image</span> <span class="n">isKindOfClass</span><span class="o">:</span><span class="p">[</span><span class="n">UIImage</span> <span class="n">class</span><span class="p">]]);</span>
 <span class="p">});</span>
 </pre></div>
 
@@ -409,13 +405,6 @@
 <p>Note that simply importing <code>PromiseKit.h</code> will import everything.</p>
 
 <h1>
-<a name="promise-factories" class="anchor" href="#promise-factories"><span class="octicon octicon-link"></span></a>Promise Factories</h1>
-
-<p>With the next version of Promise Kit we plan to add a Promise-Factory type feature so we can have promises generated from <code>NSNotificationCenter</code> and <code>UIControl</code>s and that sort of thing. It doesn't make sense to have plain promises because Promises can only be fulfilled once.</p>
-
-<p>PromiseKit aims to be a complete and delightful addition to your toolkit.</p>
-
-<h1>
 <a name="deferred" class="anchor" href="#deferred"><span class="octicon octicon-link"></span></a>Deferred</h1>
 
 <p>If you want to write your own methods that return Promises then often you will need a <code>Deferred</code> object. Promises are deliberately opaque: you can't directly modify them, only their parent promise can.</p>
@@ -460,7 +449,7 @@
 <span class="p">}</span>
 </pre></div>
 
-<p><code>dispatch_promise</code> runs on <code>DISPATCH_QUEUE_PRIORITY_DEFAULT</code>. If you want other queue priorities then write your own dispatch wrapper around a <code>Deferred</code>.</p>
+<p><code>dispatch_promise</code> runs on <code>DISPATCH_QUEUE_PRIORITY_DEFAULT</code>. If you need another queue we also provide: <code>dispatch_promise_on</code>.</p>
 
 <h1>
 <a name="the-fine-print" class="anchor" href="#the-fine-print"><span class="octicon octicon-link"></span></a>The Fine Print</h1>
