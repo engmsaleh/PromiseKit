@@ -98,6 +98,8 @@
 
 <p>Code with promises is about as close as we can get to clean, synchronous code (at least until Apple give us <code>@await</code>…).</p>
 
+<p>The above code dispatches a promise to a background queue, where it computes the md5, the md5 is then input to the next Promise which returns a new Promise that downloads the gravatar. If you return a Promise from a <code>then</code> block the next Promise (ie. the Promise returned by the <code>then</code>) waits (asynchronously) for that Promise to fulfill before it executes its <code>then</code> blocks. PromiseKit’s <code>NSURLConnection</code> category methods automatically decode images in a background thread before passing them to the next Promise.</p>
+
 <h1>
 <a name="error-handling" class="anchor" href="#error-handling"><span class="octicon octicon-link"></span></a>Error Handling</h1>
 
@@ -537,7 +539,7 @@
 
 <ul>
 <li>
-<a href="https://github.com/BoltsFramework/Bolts-iOS">Bolts</a> was the inspiration for PromiseKit. I thought that—finally—someone had written a decent Promises implementation for iOS. The lack of dedicated <code>catch</code> handler, the very ugly syntax and the overly complex design was a disappointment. You may like it, and certainly it is backed by big names™. Fundamentally, Promise-type implementations are not hard to write, so you really are making a decision based on how flexible the API is while simulatenously producing readable, clean code. I have worked hard to make PromiseKit the best choice.</li>
+<a href="https://github.com/BoltsFramework/Bolts-iOS">Bolts</a> was the inspiration for PromiseKit. I thought that—finally—someone had written a decent Promises implementation for iOS. The lack of dedicated <code>catch</code> handler, the (objectively) ugly syntax and the overly complex design was a disappointment. To be fair Bolts is not a Promise implementation, it’s… something else. You may like it, and certainly it is backed by big names™. Fundamentally, Promise-type implementations are not hard to write, so you really are making a decision based on how flexible the API is while simulatenously producing readable, clean code. I have worked hard to make PromiseKit the best choice.</li>
 <li>
 <a href="https://github.com/couchdeveloper/RXPromise">RXPromise</a> is an excellent Promise implementation that is mostly let down by syntax choices. By default thens are executed in background threads, which usually is inconvenient. <code>then</code> always return <code>id</code> and always take <code>id</code>, which makes code less elegant. There is no explicit <code>catch</code>, instead <code>then</code> always takes two blocks, the second being the error handler, which is ugly. The interface for <code>Promise</code> allows any caller to resolve it breaking encapsulation. Otherwise an excellent implementation.</li>
 <li><a href="http://cocoapods.org/?q=promise">Many others</a></li>
