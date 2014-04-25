@@ -103,46 +103,46 @@
 
 <p>A <code>Promise</code> object itself represents the <em>future</em> value of an asynchronous task.</p>
 
-<p>dispatch_promise(^{
-    // we’re in a background thread
-    return md5(email);
-}).then(^(NSString *md5){
-    // we’re back in the main thread
-    // this next line returns a <code>Promise *</code>
-    return [NSURLConnection GET:@"<a href="http://gravatar.com/avatar/%@">http://gravatar.com/avatar/%@</a>", md5];
-}).then(^(UIImage *gravatarImage){
-    // since the last <code>then</code> block returned a Promise,
-    // PromiseKit waited for it to complete before we
-    // were executed. But now we're done with its result,
-    // so let’s set that Gravatar image.
-    self.imageView.image = gravatarImage;
-});</p>
+<div class="highlight highlight-objc"><pre><span class="n">dispatch_promise</span><span class="p">(</span><span class="o">^</span><span class="p">{</span>
+    <span class="c1">// we’re in a background thread</span>
+    <span class="k">return</span> <span class="n">md5</span><span class="p">(</span><span class="n">email</span><span class="p">);</span>
+<span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">NSString</span> <span class="o">*</span><span class="n">md5</span><span class="p">){</span>
+    <span class="c1">// we’re back in the main thread</span>
+    <span class="c1">// this next line returns a `Promise *`</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">NSURLConnection</span> <span class="n">GET</span><span class="o">:</span><span class="s">@"http://gravatar.com/avatar/%@"</span><span class="p">,</span> <span class="n">md5</span><span class="p">];</span>
+<span class="p">}).</span><span class="n">then</span><span class="p">(</span><span class="o">^</span><span class="p">(</span><span class="n">UIImage</span> <span class="o">*</span><span class="n">gravatarImage</span><span class="p">){</span>
+    <span class="c1">// since the last `then` block returned a Promise,</span>
+    <span class="c1">// PromiseKit waited for it to complete before we</span>
+    <span class="c1">// were executed. But now we're done with its result,</span>
+    <span class="c1">// so let’s set that Gravatar image.</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">imageView</span><span class="p">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">gravatarImage</span><span class="p">;</span>
+<span class="p">});</span>
+</pre></div>
 
-<pre><code>
-#Error Handling
+<h1>
+<a name="error-handling" class="anchor" href="#error-handling"><span class="octicon octicon-link"></span></a>Error Handling</h1>
 
-Synchronous code has simple, clean error handling:
+<p>Synchronous code has simple, clean error handling:</p>
 
-```objc
-extern id download(id url);
+<div class="highlight highlight-objc"><pre><span class="k">extern</span> <span class="kt">id</span> <span class="nf">download</span><span class="p">(</span><span class="kt">id</span> <span class="n">url</span><span class="p">);</span>
 
-@try {
-    id json1 = download(@"http://api.service.com/user/me");
-    id uname = [json1 valueForKeyPath:@"user.name"];
-    id json2 = download([NSString stringWithFormat:@"http://api.service.com/followers/%@", uname]);
-    self.userLabel.text = @(json2[@"count"]).description;
-} @catch (NSError *error) {
-    //…
-}
+<span class="k">@try</span> <span class="p">{</span>
+    <span class="kt">id</span> <span class="n">json1</span> <span class="o">=</span> <span class="n">download</span><span class="p">(</span><span class="s">@"http://api.service.com/user/me"</span><span class="p">);</span>
+    <span class="kt">id</span> <span class="n">uname</span> <span class="o">=</span> <span class="p">[</span><span class="n">json1</span> <span class="n">valueForKeyPath</span><span class="o">:</span><span class="s">@"user.name"</span><span class="p">];</span>
+    <span class="kt">id</span> <span class="n">json2</span> <span class="o">=</span> <span class="n">download</span><span class="p">([</span><span class="n">NSString</span> <span class="n">stringWithFormat</span><span class="o">:</span><span class="s">@"http://api.service.com/followers/%@"</span><span class="p">,</span> <span class="n">uname</span><span class="p">]);</span>
+    <span class="n">self</span><span class="p">.</span><span class="n">userLabel</span><span class="p">.</span><span class="n">text</span> <span class="o">=</span> <span class="p">@(</span><span class="n">json2</span><span class="p">[</span><span class="s">@"count"</span><span class="p">]).</span><span class="n">description</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">@catch</span> <span class="p">(</span><span class="n">NSError</span> <span class="o">*</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">//…</span>
+<span class="p">}</span>
 
-id download(id url) {
-    id url = [NSURL URLWithString:@"http://api.service.com/user/me"]
-    id data = [NSData dataWithContentsOfURL:self.url];
-    id error = nil;
-    id json = [NSJSONSerialization JSONObjectWithData:data error:&amp;error];
-    if (error) @throw error;
-}
-</code></pre>
+<span class="kt">id</span> <span class="n">download</span><span class="p">(</span><span class="kt">id</span> <span class="n">url</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">id</span> <span class="n">url</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSURL</span> <span class="n">URLWithString</span><span class="o">:</span><span class="s">@"http://api.service.com/user/me"</span><span class="p">]</span>
+    <span class="kt">id</span> <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSData</span> <span class="n">dataWithContentsOfURL</span><span class="o">:</span><span class="n">self</span><span class="p">.</span><span class="n">url</span><span class="p">];</span>
+    <span class="kt">id</span> <span class="n">error</span> <span class="o">=</span> <span class="nb">nil</span><span class="p">;</span>
+    <span class="kt">id</span> <span class="n">json</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSJSONSerialization</span> <span class="n">JSONObjectWithData</span><span class="o">:</span><span class="n">data</span> <span class="n">error</span><span class="o">:&amp;</span><span class="n">error</span><span class="p">];</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="k">@throw</span> <span class="n">error</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
 
 <p>Error handling with asynchronous code is notoriously tricky:</p>
 
